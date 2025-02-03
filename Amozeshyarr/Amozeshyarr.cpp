@@ -1,213 +1,210 @@
-#include<iostream>
-#include<string>
+#include <iostream>
+#include <string>
+#include <vector>
+#include <fstream>
+#include <iomanip>
+#include <limits>
+#include <stdexcept>
 
 using namespace std;
-int mashrot  ;
-int pass = 0;
-int NUMSUM;
-string dars[7] = { "fizik_p","fizik_1","riazi p","riazi_1","Barname nevisi","adabiat","zaban_p" };
-int Num[7] = {11,1,6,5,0,13};
-int vahed[7] = {2,3,2,3,3,3,2,};
-string id[6] = { "First_Name:","Last_name:","Father_Name:","Born_Date(0000/00/00):","National_code:","Field of Study:" };
-string pardakht[5] = { "pish_pardakht", "pardakht_Bime","pardakht_khadamat","pardakht_khbgah","pardkht_agsaat" };
 
+// ==================== کلاس‌ها ====================
+class Student {
+public:
+    string firstName;
+    string lastName;
+    string fatherName;
+    string birthDate;
+    string nationalCode;
+    string fieldOfStudy;
+    vector<string> registeredCourses;
 
-void Etkhb_vahed(string dars[],int vahed[],int num[], int size) {
+    void saveToFile() {
+        ofstream file("student_data.txt");
+        file << firstName << "\n"
+             << lastName << "\n"
+             << fatherName << "\n"
+             << birthDate << "\n"
+             << nationalCode << "\n"
+             << fieldOfStudy << "\n";
+        file << registeredCourses.size() << "\n";
+        for (auto& course : registeredCourses) {
+            file << course << "\n";
+        }
+        file.close();
+    }
 
+    void loadFromFile() {
+        ifstream file("student_data.txt");
+        if (file) {
+            getline(file, firstName);
+            getline(file, lastName);
+            getline(file, fatherName);
+            getline(file, birthDate);
+            getline(file, nationalCode);
+            getline(file, fieldOfStudy);
+            
+            int courseCount;
+            file >> courseCount;
+            file.ignore();
+            registeredCourses.clear();
+            for (int i = 0; i < courseCount; i++) {
+                string course;
+                getline(file, course);
+                registeredCourses.push_back(course);
+            }
+            file.close();
+        }
+    }
 
-	for (int i = 0; i < size; i++)
-	{
-
-		NUMSUM += Num[i];
-	}
-	mashrot = NUMSUM / 7;
-	if (mashrot < 12) {
-
-		cout << "|vaziat: mashrot!|" << endl;
-		cout << "===========================" << endl;
-		cout << "mojaze be entkhab:14 vahed" << endl;
-		cout << "===========================" << endl;
-	}
-	else {
-		cout << "|vaziat: ghabol|" << endl;
-		cout << "===========================" << endl;
-		cout << "mojaze be entkhab:18 vahed" << endl;
-		cout << "===========================" << endl;
-	}
-	for (int i = 0; i < size; i++)
-	{
-
-		cout << "shomare dars" << "|" << i << "|" << dars[i] << "|" << "| vahed |" << vahed[i] << endl;
-		cout << "==============================================================================" << endl;
-		 
-	}
-	if (mashrot<12)
-	{
-		mashrot = 14;
-	}
-	else
-	{
-		mashrot = 18;
-	}
-
-	int p;
-
-	for (int i = 0; i <= mashrot; i++)
-	{
-		cout << "Entekhab_kon:>>";
-		cin >> p;
-		i += vahed[p];
-
-
-
-	}
-	cout << "=========================="<<endl;
-	cout << "Entekhab_Shoma_tamam_shod:"<<endl;
-
-
-
-
-
+    void displayProfile() {
+        system("cls");
+        cout << "=== Student Profile ===" << endl
+             << "First Name: " << firstName << endl
+             << "Last Name: " << lastName << endl
+             << "Father's Name: " << fatherName << endl
+             << "Birth Date: " << birthDate << endl
+             << "National Code: " << nationalCode << endl
+             << "Field of Study: " << fieldOfStudy << endl
+             << "Registered Courses: " << registeredCourses.size() << endl;
+    }
 };
 
-void malli(string pardakht[],int size) {
-
-	for (int i = 0; i < size; i++)
-	{
-		cout << i << "|" << pardakht[i] << "|" << ">>"<<"0-IRR"<<"|" << endl;
-	}
-};
-void karnameh(string karnameh[],int num[],int vahed[], int size) {
-
-	for (int i = 0; i < size; i++)
-	{
-		cout << "shomare dars" << "|" << i << "|" << karnameh[i] << "|"<< "numre" <<"|" << num[i] << "|" <<"vahed |"<<vahed[i] << endl;
-
-	}
-
-};
-void profil(string id[], string prof[], int size){
-
-
-	//id
-	for (int i = 0; i < size; i++)
-	{
-
-		cout << i << " |-Enter>>" << id[i] ;
-		cin >> prof[i];
-		cout << "|=====================|" << endl;
-
-
-	}
-	system("cls");
-	//profil
-	cout << "<|your profil|>:" << endl;
-	for (int i = 0; i < 6; i++)
-	{
-		cout << "|" << id[i] << "<|" << prof[i] << "|> " << endl;
-		cout << "|=========================|" << endl;
-	}
-	cout << "<(Welcome to Amozeshyar)>" << endl;
-	cout << "===========================" << endl;
-
-
-};
-void menu(){
-	string menu[4] = { "Entkhab vahed","karnamehm ", "vaziat_mali" ,"vaziat_Term" };
-	for (int i = 0; i < 4; i++)
-	{
-		cout << i << "|" << menu[i] << "|" << endl;
-	}
-
+// ==================== توابع کمکی ====================
+int getIntInput(const string& prompt) {
+    int value;
+    while (true) {
+        cout << prompt;
+        if (cin >> value) {
+            cin.ignore();
+            return value;
+        }
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cout << "!ورودی نامعتبر - لطفا عدد وارد کنید" << endl;
+    }
 }
 
-int main(){
-	string profill[6]= { };
-	profil(id, profill, 6);
-Menu:
-	menu();
-	 int op;
-	 cout << "======================" << endl;
-	cout << "what can i help you?:";
-	cin >> op;
-	/////////
-	system("cls");
-	string exit;
-	int sum = 0;
-	 switch (op)
-	{
-	 case 0:
-		 Etkhb_vahed(dars, vahed,Num, 7);
-		 cout << "do you want exit ? ";
-		 cin >> exit;
-		 if (exit == "yes")
-			 system("cls");
-		 goto  Menu;
-		 break;
-	case 1:
-		karnameh(dars,Num,vahed,7);
-		cout << "do you want exit ? ";
-		cin >> exit;
-		if (exit == "yes")
-			system("cls");
-			goto  Menu;
-	
-			break;
+string getStringInput(const string& prompt) {
+    string value;
+    cout << prompt;
+    getline(cin, value);
+    return value;
+}
 
-	case 2:
-		malli(pardakht, 5);
-		cout << "do you want exit ? ";
-		cin >> exit;
-		if (exit == "yes")
-			system("cls");
-		goto  Menu;
-		break;
+// ==================== سیستم آموزشی ====================
+class CourseManager {
+public:
+    vector<string> availableCourses = {
+        "Physics 1 (3 units)",
+        "Calculus (4 units)",
+        "Programming (3 units)",
+        "Literature (2 units)",
+        "English (2 units)"
+    };
 
-	case 3:
-		for (int i = 0; i < 6; i++)
-		{
-			cout << "|" << id[i] << "<|" << profill[i] << "|> " << endl;
-			cout << "|=========================|" << endl;
-		}
-		cout << "========================" << endl;
-		cout << "|Nimsall tahsili:(4021)|" << endl;
-		cout << "========================" << endl;
-		for (int i = 0; i < 7; i++)
-		{
-			sum += vahed[i];
-		}
-		for (int i = 0; i < 7; i++)
-		{
-		
-			NUMSUM += Num[i];
-		}
-		for (int i = 0; i < 7; i++)
-		{
-			if (Num[i] >= 10)
-			{
-				pass++;
+    void showCourses(Student& student) {
+        system("cls");
+        cout << "=== Available Courses ===" << endl;
+        for (int i = 0; i < availableCourses.size(); i++) {
+            cout << i+1 << ". " << availableCourses[i] << endl;
+        }
+        
+        int choice = getIntInput("\nEnter course number to register (0 to cancel): ");
+        if (choice > 0 && choice <= availableCourses.size()) {
+            student.registeredCourses.push_back(availableCourses[choice-1]);
+            cout << "!ثبت نام با موفقیت انجام شد" << endl;
+        }
+        cin.ignore();
+    }
+};
 
-			}
+// ==================== سیستم مالی ====================
+class FinanceManager {
+public:
+    vector<pair<string, double>> payments = {
+        {"Tuition Fee", 5000000},
+        {"Dormitory Fee", 2000000},
+        {"Library Fee", 500000}
+    };
 
-		}
-		mashrot = NUMSUM / 7;
-		cout << "|Kole_Vahed:|" << sum << "|" << endl;
-		cout << "|jame_numre:|" << NUMSUM << "|" << endl;
-		cout << "|Kole_dars_pass_shode:|" << pass << "|" << endl;
-		cout << "|Kole_vahed_pass_shode:|" << pass << "|" << endl;
-		cout << "|kole_nomre_sal:|" << mashrot << "|" << endl;
-		if (mashrot <= 10)
-			cout << "|vaziat : Mashrot|" << endl;
-		else
-		{
-			cout << "|vaziat : ghabul|" << endl;
-		}
-		cout << "do you want exit ? ";
-		cin >> exit;
-		if (exit == "yes")
-			system("cls");
-		goto  Menu;
-		break;
-	} 
+    void showPayments() {
+        system("cls");
+        cout << "=== Financial Status ===" << endl
+             << left << setw(25) << "Item" << setw(15) << "Amount" << endl
+             << "---------------------------------" << endl;
+        
+        for (auto& [item, amount] : payments) {
+            cout << setw(25) << item 
+                 << setw(15) << fixed << setprecision(0) << amount 
+                 << " IRR" << endl;
+        }
+        cout << "\n";
+    }
+};
 
+// ==================== سیستم منوها ====================
+void showMainMenu(Student& student) {
+    CourseManager courseManager;
+    FinanceManager financeManager;
+
+    while (true) {
+        system("cls");
+        cout << "=== سیستم مدیریت دانشجویی ===" << endl
+             << "1. ثبت نام دروس" << endl
+             << "2. مشاهده نمرات" << endl
+             << "3. وضعیت مالی" << endl
+             << "4. پروفایل دانشجویی" << endl
+             << "5. خروج و ذخیره اطلاعات" << endl;
+
+        int choice = getIntInput(":گزینه مورد نظر را انتخاب کنید ");
+        
+        switch (choice) {
+            case 1:
+                courseManager.showCourses(student);
+                break;
+            case 3:
+                financeManager.showPayments();
+                break;
+            case 4:
+                student.displayProfile();
+                break;
+            case 5:
+                student.saveToFile();
+                cout << "!اطلاعات با موفقیت ذخیره شد" << endl;
+                exit(0);
+            default:
+                cout << "!گزینه نامعتبر" << endl;
+        }
+        cout << "\nPress Enter to continue...";
+        cin.ignore();
+    }
+}
+
+// ==================== تابع اصلی ====================
+int main() {
+    Student student;
+    
+    // بارگذاری اطلاعات ذخیره شده
+    try {
+        student.loadFromFile();
+        cout << "!اطلاعات قبلی با موفقیت بارگذاری شد" << endl;
+    } catch (...) {
+        cout << "!هیچ اطلاعات ذخیره شده ای یافت نشد" << endl;
+    }
+
+    // ورود اطلاعات اولیه
+    if (student.firstName.empty()) {
+        system("cls");
+        cout << "=== ثبت اطلاعات اولیه ===" << endl;
+        student.firstName = getStringInput("نام: ");
+        student.lastName = getStringInput("نام خانوادگی: ");
+        student.fatherName = getStringInput("نام پدر: ");
+        student.birthDate = getStringInput("تاریخ تولد (1402/05/15): ");
+        student.nationalCode = getStringInput("کد ملی: ");
+        student.fieldOfStudy = getStringInput("رشته تحصیلی: ");
+    }
+
+    showMainMenu(student);
+    return 0;
 }
